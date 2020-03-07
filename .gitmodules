@@ -1,3 +1,6 @@
 [submodule "2ano/2semestre/POO/Projeto_POO_1819"]
 	path = 2ano/2semestre/POO/Projeto_POO_1819
 	url = https://github.com/filipeguimaraes/Projeto_POO_1819.git
+[submodule "2ano/2semestre/LI3/LI3_java"]
+	path = 2ano/2semestre/LI3/LI3_java
+	url = https://github.com/filipeguimaraes/LI3_java.git
