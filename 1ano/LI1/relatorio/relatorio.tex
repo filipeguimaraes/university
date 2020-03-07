@@ -1,0 +1,329 @@
+\documentclass[a4paper]{report} % estilo do documento
+
+\usepackage[utf8]{inputenc} %encoding do ficheiro
+\usepackage[portuges]{babel} % para língua portuguesa
+\usepackage{graphicx} % para importar imagens
+\usepackage{minted}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{color}
+
+\begin{document}
+
+\title{ \textbf {Relatório Trabalho Prático LI1}}
+\author{Grupo 49\\  
+\\
+Filipe Guimarães e Gonçalo Ferreira}
+\date{\today}
+
+
+\begin{figure}[b]
+\centering % optional
+\includegraphics[scale=0.7]{LOGO.PNG}    
+\end{figure}
+
+\maketitle
+
+\tableofcontents %listing ou verbatim ou no exemplo
+
+\listoffigures
+
+
+%% Introdução
+\chapter{Introdução}
+
+  \section{Contextualização}
+  
+Este documento, sobre o projeto \emph{"Micro Machines"}, desenvolvido no âmbito da disciplina \textbf{LI1}, aborda o nosso método de aplicação em cada fase do projeto de forma breve e conscisa.
+Este relatório está dividido em 3 capítulos para além desta Introdução e da posterior Conclusão.
+
+\textbf{ Capítulo 2 - \emph{Análise de Requisitos} -} É apresentada a nossa análise sobre as diversas tarefas propostas e o seu problema em concreto.
+
+\textbf{ Capítulo 3 - \emph{A Nossa Solução} -} Descrição da  nossa resolução em cada problema.
+
+\textbf{ Capítulo 4 - \emph{Validação da Solução} -} Parte do trabalho em que explicamos a nossa metodologia de avaliação do desenvolvimento de cada tarefa.
+
+
+
+  \section{Motivação}
+Para a realização deste trabalho tivemos como motivação o facto de podermos aplicar os conceitos aprendidos na UC de \textbf{PF}.Conseguimos perceber que, mesmo sendo \emph{Haskell} uma linguagem puramente funcional, pode ser usada para criar coisas divertidas como jogos.
+  
+  \section{Objectivos}
+Os objetivos deste projeto é o desenvolvimento do clássico jogo 
+\emph{"Micro Machines"}, que se pode jogar em \url{https://goo.gl/igcepN}, em que se tem de completar um percurso pré-definido no menor tempo possível.
+
+
+
+
+
+%% Análise de Requisitos e Especificação do Problema
+\chapter{Análise de Requisitos}
+
+\section{Fase 1}
+\label{sec:analisefase1}
+
+A primeira fase do projeto baseou-se em 3 tarefas sendo elas:
+
+\textbf{ Tarefa 1 - \emph{Construir Mapas} -} O objetivo desta tarefa é construir um mapa para o jogo seguindo um caminho previamente registado fazendo para isso o uso da função \emph{constroi} : 
+\begin{minted}{haskell}
+constroi :: Caminho -> Mapa
+constroi c = Mapa (partida c, dirInit) tab
+\end{minted}
+
+
+
+
+\textbf{ Tarefa 2 - \emph{Validar Mapas} -} O objetivo desta tarefa é testar se um dado mapa é ou não válido de acordo com um conjunto
+de regras:
+\begin{itemize}
+\item Existe apenas um percurso e todas as peças fora desse percurso são do tipo lava;
+\item O percurso deve corresponder a uma trajetória, tal que começando na peça de partida
+com a orientação inicial volta-se a chegar à peça de partida com a orientação inicial;
+\item A orientação inicial tem que ser compatível com a peça de partida. Como é sugerido na
+imagem abaixo, considera-se que a orientação é compatível com a peça se for possível
+entrar na peça seguindo essa orientação (note que esta questão só é relevante para as
+peças do tipo curva e rampa);
+\item As peças do percurso só podem estar ligadas a peças do percurso com alturas
+compatíveis;
+\item Todas as peças do tipo lava estão à altura 0;
+\item O mapa é sempre retangular e rodeado por lava, ou seja, a primeira e última linha,
+assim como a primeira e última coluna são constituídas por peças necessariamente do
+tipo lava.
+\end{itemize}
+Para isso o uso da função \emph{valida} : 
+\begin{minted}{haskell}
+valida :: Mapa -> Bool
+\end{minted}
+
+
+\textbf{ Tarefa 3 - \emph{Movimentar o Carro} -} O objetivo desta tarefa é começar a implementar a mecânica do jogo, concretamente as
+movimentações do carro no mapa de jogo e as respetivas colisões com obstáculos. Concretamente, o objetivo desta tarefa é definir a função
+
+\begin{minted}{haskell}
+movimenta :: Tabuleiro -> Tempo -> Carro -> Maybe Carro 
+\end{minted}
+
+que recebe um tabuleiro, um período de tempo e um
+carro, e calcula o novo estado do carro após se ter movimentado durante o período de tempo
+dado. As regras de colisões são em as mesmas da física, sendo também que: 
+\begin{itemize}
+\item A direção do carro não é alterada;
+\item O carro desloca-se a velocidade constante e nem “acelera” nem “curva”, inclusive
+durante colisões. Mais concretamente, o “valor absoluto” da velocidade não é alterado,
+mas sim a sua direção de acordo com o ângulo de colisão;
+\item O resultado é do tipo \textbf{Maybe Carro} para contemplar a possibilidade de o carro ser
+“destruído”, devendo a função devolver \textbf{Nothing} quando o carro é “destruído” (em
+qualquer momento durante a sua movimentação), ou \textbf{Just} e em caso contrário, sendo
+e o novo estado do carro
+\end{itemize}
+
+\section{Fase 2}
+\label{sec:analisefase2}
+
+A segunda fase do projeto baseou-se, tal como a primeira, em 3 tarefas sendo elas:
+
+\textbf{ Tarefa 4 - \emph{Atualizar Estado} -}O objetivo desta tarefa é atualizar o estado do jogo dadas as ações efetuadas por um
+jogador num período de tempo. Para isso é necessário representar:
+
+\begin{itemize}
+
+\item  Jogo - o estado interno do jogo (que deverá ser atualizado em cada instante);
+\item Ação - algo que vai indicar, por exemplo, se o carro está a acelerar, travar, ou curvar. 
+
+\end{itemize}
+
+Esta Tarefa faz uso da função \emph{atualiza} que, dado um período de tempo, o estado atual do jogo, o identificador de um jogador, e a ação efetuada por esse jogador, atualiza o estado do jogo
+ 
+
+\begin{minted}{haskell}
+ atualiza :: Tempo -> Jogo -> Int -> Acao -> Jogo 
+\end{minted}
+
+
+
+\textbf{ Tarefa 5 - \emph{Implementação do Jogo em Gloss} -} O objetivo desta tarefa é implementar o jogo completo usando a biblioteca Gloss. No cerne desta tarefa estão as funções da Tarefa 4 (\emph{atualiza)}, que atualiza o estado dos
+carros de acordo com as decisões dos jogadores, e da Tarefa 3 (\emph{movimenta}), que atualiza a
+posição do carro de acordo com esse estado.
+
+
+
+\textbf{ Tarefa 6 \emph{- Implementação de uma Estratégia de Corrida (BOT)} -} O objectivo desta tarefa é implementar um bot que jogue Micro Machines automaticamente.
+
+
+%% Descrição da Solução Desenvolvida
+\chapter{A Nossa Solução}
+\label{sec:solucao}
+
+\section{Fase 1}
+\label{sec:solucaofase1}
+
+\subsection{Tarefa 1}
+\label{subsec:solucaotarefa1}
+
+Para a realização desta tarefa e de modo a cumprir os objetivos descritos em \ref{sec:analisefase1}
+definimos uma estratégia que passa por:
+
+\begin{enumerate}
+
+\item A criação de um tabuleiro constituído por peças do tipo Lava começamos por definir uma função que crie um tabuleiro de lava. Primeiramente linhas com:
+
+\begin{minted}{Haskell}
+tablinha :: Dimensao -> [Peca]
+tablinha (0,b) = []
+tablinha (a,b) = Peca Lava 0 : tablinha ( (a-1) , b ) 
+\end{minted}
+e depois usá-la para criar o tabuleiro completo: 
+
+\begin{minted}{Haskell}
+tablava :: Dimensao -> Tabuleiro
+tablava (a,0) = [] 
+tablava (a,b) = tablinha (a,b) : tablava ( a , (b-1)) 
+\end{minted}
+
+\item Com o tabuleiro de lava criado avançamos para a criação de uma função que coloca uma determinada peça nesse tabuleiro :
+
+\begin{minted}{Haskell}
+modTabuleiro :: Tabuleiro -> Posicao -> Posicao -> Peca -> Tabuleiro
+modTabuleiro (h:t) (x, y) (b1,b2) p
+            | y == b2   = (aux_modTabuleiro h (0,0) (b1,b2) p) : t
+            | otherwise = h : (modTabuleiro t (x,y+1) (b1,b2) p)
+\end{minted}
+que funciona, tal como a \emph{tablinha}, juntamente com:
+
+\begin{minted}{Haskell}
+aux_modTabuleiro :: [Peca] -> Posicao -> Posicao -> Peca -> [Peca]
+aux_modTabuleiro (h:t) (x,y) (b1,b2) p 
+           | x == b1   = p:t
+           | otherwise = h : aux_modTabuleiro t (x+1,y) (b1,b2) p
+\end{minted}
+que coloca a peça, dentro de uma linha, na posição correta.
+
+\item Transformamos então um caminho numa lista de peças com:
+\small{
+\begin{minted}{Haskell}
+passo2peca :: Caminho -> Orientacao -> Altura -> [Peca]
+passo2peca [] _  _ = []
+passo2peca (a:b) o2 h 
+    | a == Avanca   = (Peca Recta h) : passo2peca (b) (orienta o2 a) h
+    | a == CurvaDir = (Peca (Curva (oriCurva o2 a)) h) : passo2peca (b) 
+    (orienta o2 a) h
+    | a == CurvaEsq = (Peca (Curva (oriCurva o2 a)) h) : passo2peca (b) 
+    (orienta o2 a) h
+    | a == Sobe     = (Peca (Rampa o2) h) : passo2peca (b) (orienta o2 a)
+    (h+1)
+    | otherwise     = (Peca (Rampa (oriDesce o2)) (h-1)) : passo2peca (b) 
+    o2 (h-1)
+\end{minted}
+}
+e que tem como auxiliares as funções {\color{blue}\emph{oriDesce}}
+, que determina a orientação de uma peça do tipo rampa, {\color{blue}\emph{oriCurva}}, que determina a orientação de uma peça do tipo curva, {\color{blue}\emph{orienta}}, tendo a direção e o tipo de passo anterior calcula onde estará a próxima peça.
+
+\item Pegamos numa orientação e num caminho e com as seguintes funções criamos uma lista com as posições, por ordem .
+\begin{minted}{Haskell}
+posnotab :: [Orientacao] -> Posicao -> [Posicao]
+posnotab [] (x,y) = []
+posnotab (h:t) (x,y) | Este  == h = (x,y) : posnotab t (x+1,y)
+                     | Oeste == h = (x,y) : posnotab t (x-1,y)
+                     | Sul   == h = (x,y) : posnotab t (x,y+1)
+                     | otherwise  = (x,y) : posnotab t (x,y-1)
+
+aux_posnotab :: Orientacao -> Caminho -> [Orientacao]
+aux_posnotab a [b] = [a]
+aux_posnotab a (q:w:e) = a :(aux_posnotab (orienta a w) (w:e))
+\end{minted}
+
+\end{enumerate}
+
+Com a estratégia definida de 1 a 4 conseguimos desenvolver a função:
+
+\begin{minted}{Haskell}
+
+constroi :: Caminho -> Mapa
+constroi c = Mapa (partida c, dirInit) tab
+         where tab = (fazTabuleiro (tablava (dimensao c)) (passo2peca 
+         c dirInit 0) (posnotab (aux_posnotab dirInit c) (partida c)) ) 
+\end{minted}
+que a partir de um caminho cria um mapa.
+
+
+\subsection{Tarefa 2}
+\label{subsec:solucaotarefa2}
+
+Usamos a seguinte função para validar qualquer mapa que nós lhe fornecemos.
+\begin{minted}{Haskell}
+
+valida :: Mapa -> Bool
+valida (Mapa ((x,y),o) t) = validaLpeca (peca2estrada (Mapa ((x,y),o) t) 
+(findPeca (x,y) t) (contaPecas t 0) (x,y) []) && retangulo t && checkLava 
+(bordasLava t (0,0)) && checkLava (takeLava t) && iniFim (peca2estrada 
+(Mapa ((x,y),o) t) (findPeca (x,y) t) (contaPecas t 0) (x,y) [])
+
+\end{minted}
+que usa como auxiliares, para funcionar, as seguintes funções:
+
+\begin{enumerate}
+    \item Função {\color{blue}\emph{retangulo}} que verifica se um determinado tabuleiro é retangulo. 
+    
+    \item Função {\color{blue}\emph{checkLava}} que pega na lista gerada pela {\color{blue}\emph{bordasLava}},que retira as bordas de um determinado tabuleiro, e verifica se todos os elementos são peças lava.
+
+    \item Função {\color{blue}\emph{findPeca}}que identifica qual é uma peça numa determinada posição, juntamente com  {\color{blue}\emph{auxfindPeca}} que procura uma peça numa determinada coluna.
+    
+    \item Função {\color{blue}\emph{peca 2 estrada}} que calcula uma lista com tuplos do tipo (Peca, Posicao, Orientacao) de cada peca num tabuleiro, com o auxílio da {\color{blue}\emph{posPecas}}  que  calcula a posição em que estamos no tabuleiro após uma dada orientação.
+    
+    \item Função {\color{blue}\emph{oripecas}} que calcula onde uma determinada peça se situa após uma curva. 
+    
+    \item Função {\color{blue}\emph{contaPecas}} que conta quantas peças que não são Lava num determinado tabuleiro.
+
+    \item Função {\color{blue}\emph{validaLpecas}} que verifica se as peças são compatives com as em sua volta juntamento com {\color{blue}\emph{iniFim}} que verifica se a última peça do tabuleiro é compatível com a primeira.
+    
+\end{enumerate}
+
+
+\subsection{Tarefa 3}
+\label{subsec:solucaotarefa3}
+
+Para a Tarefa 3 a nossa solução funciona com base nas coordenadas fornecidas pelo Carro, calculando assim qual será a próxima posição do carro, após esse calculo outra função {\color{blue}\emph{findPeca}} mostra qual a peça atual em que o carro se encontra, de modo a verificar se está em estrada ou lava. Assim está tarefa recorre a um método recursivo de calcular todas as as posições admitidas pelo Carro num Tempo, nas quais se obtive-se um valor inapropriado ( ou seja o Carro encontrar-se na lava) daria \emph{Nothing}, caso contrario calculava até a sua nova posição.
+
+
+\section{Fase 2}
+\label{sec:solucaofase2}
+
+\subsection{Tarefa 4}
+\label{subsec:solucaotarefa4}
+A Tarefa 4 é faseada por 4 secções.
+Primeiramente atualizar o vetor velocidade que foi a abordado da seguinte forma, calculo de todos os vetores aplicados ao Carro, que foram diferenciados para as diversas ações, como por exemplo acelerar. Após o calculo de todos os vetores aplicados, segui-se a soma em cartesianos dos mesmos.
+Atualizar a direção do carro que era aumentar ou diminuir de acordo com o tempo e a constante.
+Atualizar a lista de nitros em que se subtraia no numero do jogador o tempo da Ação com nitro aplicada.
+E por ultimo atualizar o Histórico de cada jogador em que se adicionava a Posição atual ao historico de acordo com o numero do jogador.
+
+\subsection{Tarefa 5}
+\label{subsec:solucaotarefa5}
+Para a realização desta tarefa começamos por criar um mapa de maneira a que fosse apresentado corretamente. Após isso colocamos os carros no sitio onde deveriam ser apresentados e associamos as varias teclas a ações que, usando as funções definidas na Tarefa 3 e 4 fazem o carro se movimentar.
+Isto funciona graças á função {\color{blue}\emph{joga}} que faz com que a {\color{blue}\emph{main}} apresente o jogo completo.
+
+\subsection{Tarefa 6}
+\label{subsec:solucaotarefa6}
+A nossa solução passou por, com base nas funções definidas na Tarefa 2, fazer o trajeto definido pelo carro. A partir desse trajeto definir qual é a função do bot, usando funções trigonométricas, de maneira a que o carro se mantivesse na pista.
+
+% Como foi validada a implementação da solução
+\chapter{Validação da Solução}
+
+
+Para validar, ao longo do projeto , as nossas soluções recorremos a vários métodos.
+
+\begin{enumerate}
+    \item Para funções mais visuais recorremos a desenhos para perceber como deveria ficar determinada função. (Exemplo disso é na Tarefa 1 visualizar como ficava os mesmo tipos de peças com diferentes orientações)
+    \item Usamos testes (disponíveis em cada tarefa) no \emph{ghci} para funções em que precisávamos de perceber se funcionavam para diversos casos.
+    \item Para a Tarefa 5 em especial compilámos com o \emph{GHC} a tarefa de movo a visualizarmos se a tarefa estava ou não a apresentar aquilo que pretendíamos
+\end{enumerate} 
+
+\chapter{Conclusão}
+Em suma, este projeto foi um desafio. Não conseguimos realizar todos os objetivos e, por isso, o nosso jogo final não ficou completamente funcional. mas, mesmo assim, ajudou-nos a compreender melhor a linguagem. Com as dificuldades que ultrapassamos, ficamos a compreender a lógica atrás de um jogo, bem como pensar na hora de escrever código. Para o futuro este projeto fez-nos perceber o que é a realização de um jogo e deu-nos ferramentas para que num futuro possamos desenvolver mais e melhor.
+
+
+\ldots
+
+\bibliographystyle{plain}
+\bibliography{document}    
+
+\end{document}
