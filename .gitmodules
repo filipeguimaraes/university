@@ -4,3 +4,6 @@
 [submodule "2ano/2semestre/LI3/LI3_java"]
 	path = 2ano/2semestre/LI3/LI3_java
 	url = https://github.com/filipeguimaraes/LI3_java.git
+[submodule "3ano/2semestre/CG1920GUIOES"]
+	path = 3ano/2semestre/CG1920GUIOES
+	url = https://github.com/filipeguimaraes/CG1920GUIOES.git
